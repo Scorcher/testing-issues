@@ -89,7 +89,8 @@ SHOW GRANTS;
 SHOW GRANTS FOR sa_role;
 ┌─GRANTS FOR sa_role────────────────────────────────────────────────────────────────┐
 │ GRANT SHOW TABLES, SHOW COLUMNS, SHOW DICTIONARIES, SELECT ON test.tt1 TO sa_role │
-│ GRANT SHOW TABLES, SHOW COLUMNS, SHOW DICTIONARIES, SELECT ON test.tt2 TO sa_role │ └───────────────────────────────────────────────────────────────────────────────────┘
+│ GRANT SHOW TABLES, SHOW COLUMNS, SHOW DICTIONARIES, SELECT ON test.tt2 TO sa_role │
+└───────────────────────────────────────────────────────────────────────────────────┘
 
 SELECT * FROM test.tt1
 Ok.
