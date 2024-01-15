@@ -1,0 +1,104 @@
+version: '3.7'
+
+volumes:
+  zk-data:
+  zk-datalog:
+  ch11-data:
+  ch11-logs:
+  ch12-data:
+  ch12-logs:
+  ch21-data:
+  ch21-logs:
+  ch22-data:
+  ch22-logs:
+
+networks:
+  clickhouse-schema:
+    driver: bridge
+
+x-clickhouse: &clickhouse
+  image: clickhouse/clickhouse-server:23.3.3.52
+  networks:
+    - clickhouse-schema
+  depends_on:
+    - zk
+    
+
+services:
+  zk:
+    hostname: zk
+    image: zookeeper:3.8
+    networks:
+      - clickhouse-schema
+    environment:
+      TZ: "Europe/Moscow"
+      ZOO_STANDALONE_ENABLED: "true"
+      ZOO_ADMINSERVER_ENABLED: "false"
+      ZOO_4LW_COMMANDS_WHITELIST: "'ruok,mntr'"
+      ZOO_AUTOPURGE_PURGEINTERVAL: "1"
+      ZOO_AUTOPURGE_SNAPRETAINCOUNT: "20"
+      ZOO_CFG_EXTRA: >
+        'metricsProvider.className=org.apache.zookeeper.metrics.prometheus.PrometheusMetricsProvider
+        metricsProvider.httpPort=9982'
+      JVMFLAGS: "-Xmx128m"
+      ZOO_MY_ID: "1"
+    volumes:
+      - zk-data:/data
+      - zk-datalog:/datalog
+
+  s11:
+    hostname: s11
+    environment:
+      CH_SHARD: "1"
+      CH_REPLICA: "s11"
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: "1"
+    volumes:
+      - ch11-data:/var/lib/clickhouse
+      - ch11-logs:/var/log/clickhouse-server
+      - type: bind
+        source: config.d
+        target: /etc/clickhouse-server/config.d
+    <<: *clickhouse
+
+  s12:
+    hostname: s12
+    environment:
+      CH_SHARD: "1"
+      CH_REPLICA: "s12"
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: "1"
+    volumes:
+      - ch12-data:/var/lib/clickhouse
+      - ch12-logs:/var/log/clickhouse-server
+      - type: bind
+        source: config.d
+        target: /etc/clickhouse-server/config.d
+    <<: *clickhouse
+
+  s21:
+    hostname: s21
+    environment:
+      CH_SHARD: "2"
+      CH_REPLICA: "s21"
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: "1"
+    volumes:
+      - ch21-data:/var/lib/clickhouse
+      - ch21-logs:/var/log/clickhouse-server
+      - type: bind
+        source: config.d
+        target: /etc/clickhouse-server/config.d
+    <<: *clickhouse
+
+  s22:
+    hostname: s22
+    environment:
+      CH_SHARD: "2"
+      CH_REPLICA: "s22"
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: "1"
+    volumes:
+      - ch22-data:/var/lib/clickhouse
+      - ch22-logs:/var/log/clickhouse-server
+      - type: bind
+        source: config.d
+        target: /etc/clickhouse-server/config.d
+    <<: *clickhouse
+
