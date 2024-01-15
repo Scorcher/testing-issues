@@ -66,7 +66,7 @@ Run admin console under `default` user
 docker exec -it test-ch clickhouse-client -n
 ```
 
-Initialize DB, user and roles
+Add new permissions to role
 
 ```sql
 GRANT SHOW, SELECT ON test.tt2 TO sa_role;
